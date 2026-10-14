@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Bracket Maker</title>
+  <link rel="stylesheet" href="/bracket-maker/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <h1 id="title" contenteditable="true" spellcheck="false" title="Click to rename"></h1>
+    <div class="topbar-actions">
+      <button id="reset-results" class="btn ghost" title="Clear every match result">Reset results</button>
+      <button id="start-over" class="btn ghost danger" title="Delete everything and start fresh">Start over</button>
+    </div>
+  </header>
+
+  <main>
+    <div class="bracket-tools">
+      <label class="size-pick">
+        <span class="muted">Bracket size</span>
+        <select id="size-select">
+          <option value="2">2</option>
+          <option value="4">4</option>
+          <option value="8">8</option>
+          <option value="16">16</option>
+          <option value="32">32</option>
+          <option value="64">64</option>
+        </select>
+      </label>
+      <button id="auto-fill" class="btn" title="Put contenders into the empty slots">Auto-fill</button>
+      <button id="shuffle" class="btn" title="Randomly reseed the bracket">🔀 Shuffle</button>
+      <button id="clear-bracket" class="btn ghost" title="Move every contender back to the pool">Clear</button>
+      <button id="run" class="btn primary run-btn">▶ Run bracket</button>
+    </div>
+
+    <section id="viewport" class="viewport" aria-label="Bracket">
+      <div id="stage" class="stage"></div>
+      <div class="zoom-controls">
+        <button id="zoom-in" class="icon-btn" title="Zoom in">+</button>
+        <button id="zoom-out" class="icon-btn" title="Zoom out">−</button>
+        <button id="zoom-fit" class="icon-btn" title="Fit bracket to screen">⤢</button>
+      </div>
+    </section>
+    <p class="muted hint">Scroll or pinch to zoom, drag the background to pan. Drag contenders into first-round slots; empty slots are byes.</p>
+
+    <section class="pool-section" aria-label="Contenders">
+      <div class="pool-head">
+        <h2>Contenders <span id="pool-count" class="muted"></span></h2>
+        <button id="add-item" class="btn primary" title="Search for images to add">+ Add contender</button>
+      </div>
+      <div id="pool" class="pool" data-zone="pool"></div>
+      <div class="add-panel">
+        <form id="text-form" class="add-group">
+          <input id="text-input" type="text" maxlength="40" placeholder="Contender name…" autocomplete="off" />
+          <button class="btn" type="submit">Add name</button>
+        </form>
+        <form id="url-form" class="add-group">
+          <input id="url-input" type="url" placeholder="Image URL…" autocomplete="off" />
+          <button class="btn" type="submit">Add link</button>
+        </form>
+        <label class="btn file-btn">
+          Upload images
+          <input id="file-input" type="file" accept="image/*" multiple hidden />
+        </label>
+        <button id="open-search" class="btn" type="button" title="Search the web for images">🔍 Search images</button>
+      </div>
+      <p class="muted hint">Click a contender to rename it or give it a description. You can also drop or paste images anywhere on the page.</p>
+    </section>
+  </main>
+
+  <dialog id="search-dialog" class="search-dialog" aria-label="Search images">
+    <div class="search-box">
+    <form id="search-form" class="search-bar">
+      <input id="search-input" type="search" placeholder="Search images…" autocomplete="off" enterkeyhint="search" />
+      <button class="btn primary" type="submit">Search</button>
+      <button id="search-close" class="icon-btn close-btn" type="button" title="Close">✕</button>
+    </form>
+    <div class="source-tabs" role="radiogroup" aria-label="Search source">
+      <button type="button" class="tab" role="radio" data-source="wikipedia" aria-checked="true">Wikipedia</button>
+      <button type="button" class="tab" role="radio" data-source="commons" aria-checked="false">Wikimedia Commons</button>
+    </div>
+    <div id="search-results" class="search-results"></div>
+    <div class="search-footer">
+      <span id="search-status" class="muted"></span>
+      <button id="search-more" class="btn" type="button" hidden>Load more</button>
+    </div>
+    </div>
+  </dialog>
+
+  <dialog id="edit-dialog" class="edit-dialog" aria-label="Edit contender">
+    <form id="edit-form" method="dialog" class="edit-box">
+      <div id="edit-preview" class="edit-preview"></div>
+      <label>Name <input id="edit-name" type="text" maxlength="40" autocomplete="off" required /></label>
+      <label>Description <textarea id="edit-desc" maxlength="200" rows="3" placeholder="Optional — shown on the versus screen"></textarea></label>
+      <div class="edit-actions">
+        <button id="edit-delete" class="btn ghost danger" type="button">Delete</button>
+        <span class="spacer"></span>
+        <button class="btn ghost" type="button" value="cancel" id="edit-cancel">Cancel</button>
+        <button class="btn primary" type="submit" value="save">Save</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="versus" class="versus" aria-label="Match">
+    <div class="vs-top">
+      <span id="vs-round" class="vs-round"></span>
+      <button id="vs-close" class="icon-btn close-btn" type="button" title="Close (Esc)">✕</button>
+    </div>
+    <div class="vs-arena">
+      <button class="fighter p1" type="button" data-side="0">
+        <span class="portrait"></span>
+        <span class="fighter-name"></span>
+        <span class="fighter-desc"></span>
+      </button>
+      <div class="vs-badge" aria-hidden="true">VS</div>
+      <button class="fighter p2" type="button" data-side="1">
+        <span class="portrait"></span>
+        <span class="fighter-name"></span>
+        <span class="fighter-desc"></span>
+      </button>
+    </div>
+    <div class="vs-bottom">
+      <p id="vs-status" class="vs-status">Pick the winner</p>
+      <div class="vs-actions">
+        <button id="vs-random" class="btn" type="button">🎲 Let fate decide</button>
+        <button id="vs-next" class="btn primary" type="button" hidden>Next match →</button>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="champion" class="champion" aria-label="Champion">
+    <canvas id="confetti" class="confetti"></canvas>
+    <div class="champ-box">
+      <p class="champ-kicker">🏆 Champion 🏆</p>
+      <div id="champ-portrait" class="portrait"></div>
+      <h2 id="champ-name"></h2>
+      <p id="champ-of" class="muted"></p>
+      <button id="champ-close" class="btn primary" type="button">Back to bracket</button>
+    </div>
+  </dialog>
+
+  <div id="trash" class="trash" aria-hidden="true">🗑 Drop here to delete</div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="/bracket-maker/app.js"></script>
+</body>
+</html>
