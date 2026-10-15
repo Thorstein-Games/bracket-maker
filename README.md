@@ -4,7 +4,7 @@ A client-side "build your own bracket" game, built as a no-build static site: pl
 
 ## Features
 
-- Brackets of **2, 4, 8, 16, 32 or 64** contenders. Empty first-round slots are **byes**, so any count from 2 to 64 works (e.g. 6 contenders in an 8 bracket).
+- Brackets of **2, 4, 8, 16, 32 or 64** contenders. Empty first-round slots are **byes** (the slot shows "Bye" once its opponent is filled in), so any count from 2 to 64 works (e.g. 6 contenders in an 8 bracket).
 - Add contenders by **name**, **image search** (Wikipedia / Wikimedia Commons, no API key), **file upload**, **image URL**, **drag-and-drop** onto the page, or **paste**.
 - Click a contender to **rename** it or give it a **description** (shown on the versus screen). Name-only contenders get a colored initials tile.
 - Drag contenders into first-round slots (dropping on a filled slot swaps them), back to the pool, or onto the trash bin. **Auto-fill** seats everyone waiting in standard seeding order (1v8, 4v5, 2v7, 3v6…), so byes go to the top seeds. **Shuffle** reseeds randomly.

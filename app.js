@@ -266,7 +266,11 @@ function slotEl(match, sideIdx) {
     if (match.playable && match.winner) slot.classList.add(match.winner === id ? 'won' : 'lost');
   } else {
     slot.classList.add('empty');
-    slot.textContent = id === BYE ? (match.r === 0 ? 'Empty — bye' : 'Bye') : 'TBD';
+    // Only call it a bye when someone is (or will be) on the other side to advance.
+    const other = sideIdx ? match.a : match.b;
+    if (id !== BYE) slot.textContent = 'TBD';
+    else if (other !== BYE) slot.textContent = 'Bye';
+    else slot.textContent = match.r === 0 ? 'Empty' : '—';
   }
   return slot;
 }
