@@ -10,6 +10,7 @@
   <header class="topbar">
     <h1 id="title" contenteditable="true" spellcheck="false" title="Click to rename"></h1>
     <div class="topbar-actions">
+      <button id="share" class="btn" title="Get a link to this bracket">🔗 Share</button>
       <button id="reset-results" class="btn ghost" title="Clear every match result">Reset results</button>
       <button id="start-over" class="btn ghost danger" title="Delete everything and start fresh">Start over</button>
     </div>
@@ -102,9 +103,26 @@
     </form>
   </dialog>
 
+  <dialog id="share-dialog" class="edit-dialog" aria-label="Share bracket">
+    <div class="edit-box">
+      <h2 class="dialog-title">Share this bracket</h2>
+      <p class="muted">The whole bracket is packed into the link itself, so nothing gets uploaded. Whoever opens it gets their own copy to play.</p>
+      <label class="check"><input id="share-picks" type="checkbox" checked /> Include my picks</label>
+      <input id="share-url" type="text" readonly aria-label="Share link" />
+      <p id="share-note" class="muted share-note"></p>
+      <div class="edit-actions">
+        <span class="spacer"></span>
+        <button id="share-close" class="btn ghost" type="button">Close</button>
+        <button id="share-native" class="btn" type="button" hidden>Share…</button>
+        <button id="share-copy" class="btn primary" type="button">Copy link</button>
+      </div>
+    </div>
+  </dialog>
+
   <dialog id="versus" class="versus" aria-label="Match">
     <div class="vs-top">
       <span id="vs-round" class="vs-round"></span>
+      <span id="vs-progress" class="vs-progress"></span>
       <button id="vs-close" class="icon-btn close-btn" type="button" title="Close (Esc)">✕</button>
     </div>
     <div class="vs-arena">

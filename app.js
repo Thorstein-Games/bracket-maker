@@ -509,11 +509,15 @@ $('#reset-results').addEventListener('click', () => {
   commit();
 });
 
-$('#start-over').addEventListener('click', async () => {
-  if (!confirm('Delete all contenders, images and results and start fresh?')) return;
+async function wipeImages() {
   for (const url of objectUrls.values()) URL.revokeObjectURL(url);
   objectUrls.clear();
   try { await imageDB.clear(); } catch {}
+}
+
+$('#start-over').addEventListener('click', async () => {
+  if (!confirm('Delete all contenders, images and results and start fresh?')) return;
+  await wipeImages();
   state = defaultState();
   commit();
   fitView();
@@ -540,23 +544,24 @@ $('#text-form').addEventListener('submit', (e) => {
 });
 
 // Downscale to keep storage small; fall back to the original if decoding fails (e.g. some SVGs).
-async function shrinkImage(blob) {
+async function shrinkImage(blob, side = MAX_IMAGE_SIDE, quality = 0.85) {
   try {
     const bmp = await createImageBitmap(blob);
-    const scale = Math.min(1, MAX_IMAGE_SIDE / Math.max(bmp.width, bmp.height));
+    const scale = Math.min(1, side / Math.max(bmp.width, bmp.height));
     const canvas = document.createElement('canvas');
     canvas.width = Math.max(1, Math.round(bmp.width * scale));
     canvas.height = Math.max(1, Math.round(bmp.height * scale));
     canvas.getContext('2d').drawImage(bmp, 0, 0, canvas.width, canvas.height);
     bmp.close?.();
-    const out = await new Promise((r) => canvas.toBlob(r, 'image/webp', 0.85));
+    const out = await new Promise((r) => canvas.toBlob(r, 'image/webp', quality));
     return out && out.size < blob.size ? out : blob;
   } catch {
     return blob;
   }
 }
 
-async function addImageBlob(blob, name) {
+// src: where the image came from on the web, so share links can point at it.
+async function addImageBlob(blob, name, src) {
   const id = uid();
   try {
     await imageDB.put(id, await shrinkImage(blob));
@@ -564,7 +569,7 @@ async function addImageBlob(blob, name) {
     toast('Could not store image — browser storage may be full.');
     return;
   }
-  addItem({ id, name: cleanName(name), desc: '', stored: true });
+  addItem({ id, name: cleanName(name), desc: '', stored: true, ...(src && { src }) });
 }
 
 async function addImageFiles(files) {
@@ -591,7 +596,7 @@ async function addImageFromUrl(url, name = nameFromUrl(url)) {
     if (!res.ok) throw new Error();
     const blob = await res.blob();
     if (!blob.type.startsWith('image/')) throw new Error();
-    await addImageBlob(blob, name);
+    await addImageBlob(blob, name, url);
   } catch {
     const ok = await new Promise((resolve) => {
       const img = new Image();
@@ -925,6 +930,7 @@ function openMatch(match) {
   const count = state.size / 2 ** (match.r + 1);
   vs = { key: match.key, ids: [match.a, match.b], rolling: false };
   $('#vs-round').textContent = roundName(match.r, rounds) + (count > 1 ? ` · Match ${match.m + 1} of ${count}` : '');
+  $('#vs-progress').textContent = rounds > 1 ? `Round ${match.r + 1} of ${rounds}` : '';
   fighters.forEach((f, i) => {
     const item = state.items[vs.ids[i]];
     makePortrait(item, f.querySelector('.portrait'));
@@ -1064,5 +1070,141 @@ function confetti() {
   requestAnimationFrame(frame);
 }
 
+/* ---------------- sharing (the bracket lives in the link's #fragment; no server) ---------------- */
+const SHARE_THUMB = 64; // px; uploaded images ride along as tiny thumbnails
+const SHARE_MAX = 30000; // chars; very long links get cut off by some chat apps
+
+const toBase64Url = (bytes) => {
+  let bin = '';
+  for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+  return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+};
+const fromBase64Url = (str) => Uint8Array.from(atob(str.replace(/-/g, '+').replace(/_/g, '/')), (c) => c.charCodeAt(0));
+const pipeBytes = (data, stream) => new Response(new Blob([data]).stream().pipeThrough(stream));
+const blobToDataUrl = (blob) => new Promise((resolve, reject) => {
+  const reader = new FileReader();
+  reader.onload = () => resolve(reader.result);
+  reader.onerror = () => reject(reader.error);
+  reader.readAsDataURL(blob);
+});
+
+async function encodeBracket({ picks, thumbs }) {
+  const ids = Object.keys(state.items);
+  const index = Object.fromEntries(ids.map((id, i) => [id, i]));
+  const items = [];
+  for (const id of ids) {
+    const item = state.items[id];
+    const out = { n: item.name };
+    if (item.desc) out.d = item.desc;
+    const remote = item.src || (!item.stored && item.url);
+    if (remote) out.u = remote;
+    else if (item.stored && thumbs) {
+      const blob = await imageDB.get(id).catch(() => null);
+      if (blob) out.e = await blobToDataUrl(await shrinkImage(blob, SHARE_THUMB, 0.7));
+    }
+    items.push(out);
+  }
+  const data = {
+    v: 1, t: state.title, z: state.size, i: items,
+    s: state.slots.map((id) => (id ? index[id] : -1)),
+    p: state.pool.map((id) => index[id]),
+    r: picks ? Object.fromEntries(Object.entries(state.results).map(([k, id]) => [k, index[id]])) : {},
+  };
+  const packed = await pipeBytes(JSON.stringify(data), new CompressionStream('deflate-raw')).arrayBuffer();
+  return toBase64Url(new Uint8Array(packed));
+}
+
+const shareDialog = $('#share-dialog');
+const shareUrl = $('#share-url');
+const shareNote = $('#share-note');
+
+async function updateShareLink() {
+  shareUrl.value = 'Packing…';
+  const picks = $('#share-picks').checked;
+  const hasUploads = Object.values(state.items).some((it) => it.stored && !it.src);
+  let code = await encodeBracket({ picks, thumbs: true });
+  let note = hasUploads ? 'Uploaded images are shrunk to small thumbnails to fit in the link.' : '';
+  if (code.length > SHARE_MAX) {
+    code = await encodeBracket({ picks, thumbs: false });
+    note = 'Your uploaded images are too big to fit in a link, so they’ll show as initials. Images added from search or a URL still come through.';
+  }
+  shareUrl.value = `${location.origin}${location.pathname}#b=${code}`;
+  shareNote.textContent = note;
+}
+
+$('#share').addEventListener('click', async () => {
+  if (!Object.keys(state.items).length) return toast('Add some contenders first.');
+  if (typeof CompressionStream === 'undefined') return toast('Sharing needs a newer browser.');
+  $('#share-native').hidden = !navigator.share;
+  shareDialog.showModal();
+  await updateShareLink();
+  shareUrl.select();
+});
+$('#share-picks').addEventListener('change', updateShareLink);
+$('#share-close').addEventListener('click', () => shareDialog.close());
+shareDialog.addEventListener('click', (e) => { if (e.target === shareDialog) shareDialog.close(); });
+$('#share-copy').addEventListener('click', async () => {
+  try {
+    await navigator.clipboard.writeText(shareUrl.value);
+    toast('Link copied!');
+  } catch {
+    shareUrl.select();
+    toast('Press Ctrl+C / ⌘C to copy the link.');
+  }
+});
+$('#share-native').addEventListener('click', () => {
+  navigator.share({ title: state.title, url: shareUrl.value }).catch(() => {});
+});
+
+async function openSharedLink() {
+  const m = location.hash.match(/^#b=([\w-]+)$/);
+  if (!m) return;
+  history.replaceState(null, '', location.pathname + location.search);
+  let data;
+  try {
+    data = JSON.parse(await pipeBytes(fromBase64Url(m[1]), new DecompressionStream('deflate-raw')).text());
+    if (data.v !== 1 || !SIZES.includes(data.z) || !Array.isArray(data.i) || !Array.isArray(data.s)) throw new Error();
+  } catch {
+    return toast('That share link is broken or incomplete.');
+  }
+  const title = String(data.t || 'Shared bracket').slice(0, 80);
+  if (Object.keys(state.items).length && !confirm(`Open the shared bracket “${title}”? It replaces your current bracket.`)) return;
+
+  await wipeImages();
+  const ids = data.i.map(() => uid());
+  const items = {};
+  for (const [i, raw] of data.i.entries()) {
+    const item = { id: ids[i], name: String(raw?.n || 'Contender').slice(0, 40), desc: String(raw?.d || '').slice(0, 200) };
+    if (/^https?:\/\//.test(raw?.u)) item.url = item.src = raw.u;
+    else if (/^data:image\/[a-z+]+;base64,/.test(raw?.e)) {
+      try {
+        await imageDB.put(item.id, await (await fetch(raw.e)).blob());
+        item.stored = true;
+      } catch {}
+    }
+    items[item.id] = item;
+  }
+  const idAt = (i) => ids[i] ?? null;
+  // Each contender is placed once; anyone left over (a hand-edited link) goes to the pool.
+  const placed = new Set();
+  const place = (id) => (id && !placed.has(id) ? (placed.add(id), id) : null);
+  const slots = Array.from({ length: data.z }, (_, i) => place(idAt(data.s[i])));
+  const pool = (Array.isArray(data.p) ? data.p : []).map((i) => place(idAt(i))).filter(Boolean);
+  pool.push(...ids.filter((id) => place(id)));
+  state = {
+    title,
+    size: data.z,
+    slots,
+    results: Object.fromEntries(Object.entries(data.r || {}).map(([k, i]) => [k, idAt(i)]).filter(([, id]) => id)),
+    pool,
+    items,
+  };
+  commit();
+  fitView();
+  toast(`Opened “${title}”.`);
+}
+window.addEventListener('hashchange', openSharedLink);
+
 render();
 fitView();
+openSharedLink();
