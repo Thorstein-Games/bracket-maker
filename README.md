@@ -13,6 +13,7 @@ A client-side "build your own bracket" game, built as a no-build static site: pl
 - Click **VS** on any match to replay it. Changing an earlier result clears the later results it affected.
 - **🔗 Share** gives you a link that contains the whole bracket, with or without your picks. Whoever opens it gets their own copy to play. No server or account is involved: the bracket is packed into the link itself. Images from search or a URL come through at full quality; uploaded images come through as small thumbnails (or initials, if there are too many to fit).
 - The versus screen shows which round you're in (e.g. "Round 2 of 4").
+- Link previews (Open Graph / Twitter card) show a custom share image; the page has SEO metadata and a short how-to/FAQ.
 - Everything is saved in the browser — nothing is uploaded anywhere. (Image search sends your search terms to the Wikimedia API.)
 
 ## Storage

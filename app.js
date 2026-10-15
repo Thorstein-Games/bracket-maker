@@ -157,6 +157,8 @@ function spreadOrder(size) {
 
 /* ---------------- elements ---------------- */
 const titleEl = $('#title');
+const baseTitle = document.title;
+const syncDocTitle = () => (document.title = state.title === 'My Bracket' ? baseTitle : `${state.title} – Bracket Maker`);
 const viewportEl = $('#viewport');
 const stageEl = $('#stage');
 const poolEl = $('#pool');
@@ -357,6 +359,7 @@ function renderStage() {
 
 function render() {
   titleEl.textContent = state.title;
+  syncDocTitle();
   sizeSelect.value = state.size;
   renderPool();
   renderStage();
@@ -452,6 +455,7 @@ titleEl.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventD
 titleEl.addEventListener('blur', () => {
   state.title = titleEl.textContent.trim().slice(0, 80) || 'My Bracket';
   titleEl.textContent = state.title;
+  syncDocTitle();
   save();
 });
 
@@ -1209,6 +1213,7 @@ async function openSharedLink() {
 }
 window.addEventListener('hashchange', openSharedLink);
 
+$('#year').textContent = new Date().getFullYear();
 render();
 fitView();
 openSharedLink();

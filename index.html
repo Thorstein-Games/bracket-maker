@@ -3,12 +3,65 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Bracket Maker</title>
+  <title>Bracket Maker – Build Your Own Bracket Online, Free | Thorstein Games</title>
+  <meta name="description" content="Make your own bracket for anything: foods, movies, characters, teams. Add names or images, seed 2 to 64 contenders, then battle it out match by match on an epic versus screen. Free, no sign-up." />
+  <link rel="canonical" href="https://thorsteingames.com/bracket-maker" />
+  <meta name="robots" content="index, follow, max-image-preview:large" />
+  <meta name="theme-color" content="#17171a" />
+  <link rel="icon" href="/bracket-maker/favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="/bracket-maker/apple-touch-icon.png" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Thorstein Games" />
+  <meta property="og:url" content="https://thorsteingames.com/bracket-maker" />
+  <meta property="og:title" content="Bracket Maker – Build Your Own Bracket" />
+  <meta property="og:description" content="Make a bracket for anything, then battle it out match by match on an epic versus screen. Free, no sign-up." />
+  <meta property="og:image" content="https://thorsteingames.com/bracket-maker/og-image.jpg" />
+  <meta property="og:image:type" content="image/jpeg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Bracket Maker: a tournament bracket with a red versus blue matchup" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Bracket Maker – Build Your Own Bracket" />
+  <meta name="twitter:description" content="Make a bracket for anything, then battle it out match by match on an epic versus screen." />
+  <meta name="twitter:image" content="https://thorsteingames.com/bracket-maker/og-image.jpg" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebApplication",
+        "name": "Bracket Maker",
+        "url": "https://thorsteingames.com/bracket-maker",
+        "image": "https://thorsteingames.com/bracket-maker/og-image.jpg",
+        "description": "Build your own tournament bracket for anything, from 2 to 64 contenders, then run it match by match on a versus screen.",
+        "applicationCategory": "GameApplication",
+        "operatingSystem": "Any (web browser)",
+        "isAccessibleForFree": true,
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "publisher": { "@type": "Organization", "name": "Thorstein Games", "url": "https://thorsteingames.com/" }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          { "@type": "Question", "name": "Is Bracket Maker free?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. It's free, needs no account, and runs entirely in your browser." } },
+          { "@type": "Question", "name": "How many contenders can a bracket have?", "acceptedAnswer": { "@type": "Answer", "text": "Anywhere from 2 to 64. Pick a bracket size of 2, 4, 8, 16, 32 or 64; empty first-round slots become byes, so odd numbers like 6 or 12 work too." } },
+          { "@type": "Question", "name": "How do I share my bracket?", "acceptedAnswer": { "@type": "Answer", "text": "Click Share to get a link. The whole bracket is packed into the link, with or without your picks, so friends get their own copy to play." } },
+          { "@type": "Question", "name": "Where is my bracket saved?", "acceptedAnswer": { "@type": "Answer", "text": "In your browser. Nothing is uploaded, and your bracket is still there when you come back on the same device." } }
+        ]
+      }
+    ]
+  }
+  </script>
   <link rel="stylesheet" href="/bracket-maker/style.css" />
 </head>
 <body>
   <header class="topbar">
-    <h1 id="title" contenteditable="true" spellcheck="false" title="Click to rename"></h1>
+    <div class="title-wrap">
+      <h1 class="brand">Bracket Maker</h1>
+      <h2 id="title" contenteditable="true" spellcheck="false" title="Click to rename">My Bracket</h2>
+    </div>
     <div class="topbar-actions">
       <button id="share" class="btn" title="Get a link to this bracket">🔗 Share</button>
       <button id="reset-results" class="btn ghost" title="Clear every match result">Reset results</button>
@@ -68,7 +121,41 @@
       </div>
       <p class="muted hint">Click a contender to rename it or give it a description. You can also drop or paste images anywhere on the page.</p>
     </section>
+
+    <section class="about" aria-labelledby="about-heading">
+      <h2 id="about-heading">Make a bracket for anything</h2>
+      <p>Bracket Maker is a free tournament bracket generator for settling the big debates: best pizza topping, greatest movie villain, ultimate fighter. Build it, run it, and crown a champion.</p>
+      <ol class="steps">
+        <li><strong>Add contenders.</strong> Type names, search for pictures, upload your own images or paste them in. Give each one a description if you like.</li>
+        <li><strong>Seed the bracket.</strong> Pick a size from 2 to 64, then drag contenders into place or hit Auto-fill. Empty slots become byes.</li>
+        <li><strong>Run it.</strong> Each matchup plays out on a fighting-game style versus screen. Pick the winner, or let fate decide.</li>
+        <li><strong>Share it.</strong> Send a link with or without your picks so friends can fill out their own.</li>
+      </ol>
+      <h2>FAQ</h2>
+      <dl class="faq">
+        <dt>Is Bracket Maker free?</dt>
+        <dd>Yes. It's free, needs no account, and runs entirely in your browser.</dd>
+        <dt>How many contenders can a bracket have?</dt>
+        <dd>Anywhere from 2 to 64. Pick a bracket size of 2, 4, 8, 16, 32 or 64; empty first-round slots become byes, so odd numbers like 6 or 12 work too.</dd>
+        <dt>How do I share my bracket?</dt>
+        <dd>Click Share to get a link. The whole bracket is packed into the link, with or without your picks, so friends get their own copy to play.</dd>
+        <dt>Where is my bracket saved?</dt>
+        <dd>In your browser. Nothing is uploaded, and your bracket is still there when you come back on the same device.</dd>
+      </dl>
+    </section>
   </main>
+
+  <footer class="site-footer">
+    <nav class="footer-nav" aria-label="Footer">
+      <ul class="footer-links">
+        <li><a href="https://thorsteingames.com/">Home</a></li>
+        <li><a href="https://thorsteingames.com/tier-ranker">Tier Ranker</a></li>
+        <li><a href="https://thorsteingames.com/contact">Contact</a></li>
+      </ul>
+      <a class="more-games" href="https://thorsteingames.com/" target="_blank" rel="noopener">More Games</a>
+    </nav>
+    <p class="footer-copy">© <span id="year">2026</span> Thorstein Games</p>
+  </footer>
 
   <dialog id="search-dialog" class="search-dialog" aria-label="Search images">
     <div class="search-box">

@@ -1,10 +1,15 @@
 # Bracket Maker
 
-Client-side "build your own bracket" game (sister app of `tier-ranker`, which it shares its add/search/drag code with). Plain HTML/CSS/JS with **no build step, no dependencies, no package.json**. Everything lives in three files:
+Client-side "build your own bracket" game (sister app of `tier-ranker`, which it shares its add/search/drag code with). Plain HTML/CSS/JS with **no build step, no dependencies, no package.json**. The code lives in three files:
 
 - `index.html`: markup, including the `<dialog>`s: image search, edit contender, share, versus and champion.
 - `app.js`: all logic, organised into `/* ---- section ---- */` blocks: IndexedDB, state, bracket logic, rendering, pan & zoom, adding contenders, image search, editing, drag & drop, versus screen, champion, sharing.
 - `style.css`: dark theme driven by CSS variables in `:root`. The single mobile breakpoint is `@media (max-width: 600px)`.
+- Static assets: `favicon.svg`, `apple-touch-icon.png` (180px) and `og-image.jpg` (1200×630 social share card).
+
+## SEO and sharing metadata
+
+`index.html`'s `<head>` has the title, description, canonical URL, Open Graph/Twitter tags and JSON-LD (`WebApplication` + `FAQPage`). Canonical and `og:*` URLs are absolute `https://thorsteingames.com/bracket-maker...`. The FAQ JSON-LD mirrors the visible FAQ in the `.about` section, so edit both together. The page `<h1>` is the "Bracket Maker" brand line; the editable bracket title is an `<h2>`. The footer's "More Games" button matches Sheeple's and Find the Fox's.
 
 ## Key invariants
 
@@ -21,7 +26,7 @@ Client-side "build your own bracket" game (sister app of `tier-ranker`, which it
 ## Paths and deployment
 
 - Asset paths are **absolute** (`/bracket-maker/app.js`) because thorsteingames.com proxies `/bracket-maker` to this repo's GitHub Pages site (rewrites in the `thorstein-games-website` repo's `next.config.ts`). Keep new asset references in that form.
-- `.github/workflows/pages.yml` deploys `main` and copies an **explicit file list** (`index.html style.css app.js .nojekyll`). **If you add a file the site needs, add it to that `cp` line too.**
+- `.github/workflows/pages.yml` deploys `main` and copies an **explicit file list** (`index.html style.css app.js favicon.svg apple-touch-icon.png og-image.jpg .nojekyll`). **If you add a file the site needs, add it to that `cp` line too.**
 
 ## Running and verifying
 
