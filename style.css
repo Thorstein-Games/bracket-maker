@@ -471,6 +471,12 @@ dialog::backdrop { background: rgba(0, 0, 0, 0.6); }
 .edit-actions { display: flex; gap: 8px; align-items: center; }
 .spacer { flex: 1; }
 
+.dialog-title { margin: 0; font-size: 1.15rem; }
+.edit-box > .muted { margin: 0; line-height: 1.4; }
+.edit-box label.check { flex-direction: row; align-items: center; gap: 8px; color: var(--text); font-size: 0.95rem; }
+.check input { width: 18px; height: 18px; accent-color: var(--accent); }
+.share-note:empty { display: none; }
+
 /* ---------- versus screen ---------- */
 .versus {
   width: 100vw;
@@ -515,8 +521,10 @@ dialog::backdrop { background: rgba(0, 0, 0, 0.6); }
 .vs-top, .vs-arena, .vs-bottom { position: relative; z-index: 1; }
 .vs-top {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
+  gap: 4px;
   padding: 14px 56px;
 }
 .vs-top .close-btn { position: absolute; right: 12px; top: 12px; background: rgba(0, 0, 0, 0.4); border-color: rgba(255, 255, 255, 0.25); color: #fff; }
@@ -632,6 +640,13 @@ dialog::backdrop { background: rgba(0, 0, 0, 0.6); }
   text-transform: uppercase;
   letter-spacing: 0.04em;
   text-shadow: 2px 2px 0 #000;
+}
+.vs-progress {
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
+  text-shadow: 0 1px 2px #000;
 }
 .vs-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
 .vs-actions .btn { font-size: 1rem; padding: 10px 18px; background: rgba(0, 0, 0, 0.5); border-color: rgba(255, 255, 255, 0.3); }

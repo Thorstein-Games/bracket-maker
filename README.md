@@ -11,6 +11,8 @@ A client-side "build your own bracket" game, built as a no-build static site: pl
 - The bracket is a **pan & zoom** board: scroll or pinch to zoom, drag the background to pan, ⤢ to fit.
 - **Run bracket** plays it one match at a time on a fighting-game style **versus screen**: click a fighter (or press ← / →) to pick the winner, or **🎲 Let fate decide**. Ends with a champion screen.
 - Click **VS** on any match to replay it. Changing an earlier result clears the later results it affected.
+- **🔗 Share** gives you a link that contains the whole bracket, with or without your picks. Whoever opens it gets their own copy to play. No server or account is involved: the bracket is packed into the link itself. Images from search or a URL come through at full quality; uploaded images come through as small thumbnails (or initials, if there are too many to fit).
+- The versus screen shows which round you're in (e.g. "Round 2 of 4").
 - Everything is saved in the browser — nothing is uploaded anywhere. (Image search sends your search terms to the Wikimedia API.)
 
 ## Storage
@@ -33,6 +35,6 @@ python3 -m http.server 8000
 
 ## Possible next steps
 
-- Export the bracket as a PNG to share
+- Export the bracket as a PNG
 - Multiple saved brackets
 - Group voting: each friend votes on their phone, majority advances
