@@ -29,7 +29,7 @@ Client-side "build your own bracket" game (sister app of `tier-ranker`, which it
 
 ## Paths and deployment
 
-- Asset paths are **absolute** (`/bracket-maker/app.js`) because thorsteingames.com proxies `/bracket-maker` to this repo's GitHub Pages site (rewrites in the `thorstein-games-website` repo's `next.config.ts`). Keep new asset references in that form.
+- Asset paths are **absolute** (`/bracket-maker/app.js`) because thorsteingames.com proxies `/bracket-maker` to this repo's GitHub Pages site (proxy rules in the `thorstein-games-website` repo's `public/_redirects`). Keep new asset references in that form.
 - `.github/workflows/pages.yml` deploys `main` and copies an **explicit file list** (`index.html style.css app.js favicon.svg apple-touch-icon.png og-image.jpg .nojekyll`). **If you add a file the site needs, add it to that `cp` line too.**
 
 ## Running and verifying
