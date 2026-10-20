@@ -665,6 +665,8 @@ dialog::backdrop { background: rgba(0, 0, 0, 0.6); }
 /* ---------- champion ---------- */
 /* "Play a different game" tiles (tg-bar.js) under the winner. */
 .champ-more { margin-top: 28px; color: #fff; }
+.champ-ad { width: 100%; margin-top: 16px; }
+.page-ad { padding: 24px 0; }
 .champion {
   width: 100vw;
   height: 100dvh;
@@ -675,11 +677,14 @@ dialog::backdrop { background: rgba(0, 0, 0, 0.6); }
   border: none;
   color: var(--text);
   background: radial-gradient(circle at 50% 40%, #3b3110, #0b0b10 65%);
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
-.champion[open] { display: grid; place-items: center; }
+/* margin: auto centres the box but lets it scroll from the top once the ad
+   makes it taller than the screen. */
+.champion[open] { display: grid; }
 .confetti { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
-.champ-box { position: relative; display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 24px; text-align: center; }
+.champ-box { margin: auto; position: relative; display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 24px; text-align: center; }
 .champ-kicker { margin: 0; font-weight: 900; font-style: italic; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gold); font-size: 1.2rem; }
 .champ-box .portrait {
   width: min(60vw, 45vh, 320px);
