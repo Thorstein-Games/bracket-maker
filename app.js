@@ -1213,7 +1213,6 @@ async function openSharedLink() {
 }
 window.addEventListener('hashchange', openSharedLink);
 
-$('#year').textContent = new Date().getFullYear();
 render();
 fitView();
 openSharedLink();

@@ -55,8 +55,11 @@
   }
   </script>
   <link rel="stylesheet" href="/bracket-maker/style.css" />
+  <!-- Shared Thorstein Games bar and footer (see CLAUDE.md). -->
+  <script src="https://thorsteingames.com/tg-bar.js" async></script>
 </head>
 <body>
+  <tg-bar game="bracket-maker"></tg-bar>
   <header class="topbar">
     <div class="title-wrap">
       <h1 class="brand">Bracket Maker</h1>
@@ -145,18 +148,7 @@
     </section>
   </main>
 
-  <footer class="site-footer">
-    <nav class="footer-nav" aria-label="Footer">
-      <ul class="footer-links">
-        <li><a href="https://thorsteingames.com/">Home</a></li>
-        <li><a href="https://thorsteingames.com/tier-ranker">Tier Ranker</a></li>
-        <li><a href="https://thorsteingames.com/contact">Contact</a></li>
-        <li><a href="https://thorsteingames.com/privacy">Privacy</a></li>
-      </ul>
-      <a class="more-games" href="https://thorsteingames.com/" target="_blank" rel="noopener">More Games</a>
-    </nav>
-    <p class="footer-copy">© <span id="year">2026</span> Thorstein Games</p>
-  </footer>
+  <tg-footer game="bracket-maker"></tg-footer>
 
   <dialog id="search-dialog" class="search-dialog" aria-label="Search images">
     <div class="search-box">
@@ -243,6 +235,7 @@
       <h2 id="champ-name"></h2>
       <p id="champ-of" class="muted"></p>
       <button id="champ-close" class="btn primary" type="button">Back to bracket</button>
+      <tg-more-games game="bracket-maker" class="champ-more"></tg-more-games>
     </div>
   </dialog>
 

@@ -9,7 +9,11 @@ Client-side "build your own bracket" game (sister app of `tier-ranker`, which it
 
 ## SEO and sharing metadata
 
-`index.html`'s `<head>` has the title, description, canonical URL, Open Graph/Twitter tags and JSON-LD (`WebApplication` + `FAQPage`). Canonical and `og:*` URLs are absolute `https://thorsteingames.com/bracket-maker...`. The FAQ JSON-LD mirrors the visible FAQ in the `.about` section, so edit both together. The page `<h1>` is the "Bracket Maker" brand line; the editable bracket title is an `<h2>`. The footer's "More Games" button matches Sheeple's and Find the Fox's.
+`index.html`'s `<head>` has the title, description, canonical URL, Open Graph/Twitter tags and JSON-LD (`WebApplication` + `FAQPage`). Canonical and `og:*` URLs are absolute `https://thorsteingames.com/bracket-maker...`. The FAQ JSON-LD mirrors the visible FAQ in the `.about` section, so edit both together. The page `<h1>` is the "Bracket Maker" brand line; the editable bracket title is an `<h2>`.
+
+## Shared Thorstein Games bar and footer
+
+`index.html` loads `https://thorsteingames.com/tg-bar.js` (served by the thorstein-games-website repo, whose CLAUDE.md has the full contract) and uses `<tg-bar game="bracket-maker">` (thin site header, first in `<body>`, hides while scrolling down) and `<tg-footer game="bracket-maker">` (other games, More Games, contact, privacy, copyright) after `<main>`. `<tg-more-games game="bracket-maker">` ("Play a different game") sits under the winner in the champion dialog. The bar is always 40px; `style.css` holds that space before the script loads (`tg-bar:not(:defined)`). The page is longer than a screen, so the footer stays below the fold. When checking locally without network the elements stay empty, which is fine.
 
 ## Key invariants
 
