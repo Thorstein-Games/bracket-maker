@@ -1,13 +1,19 @@
 name: Tests
 
+# A pull request shows the checks of its branch's pushes, so there's no
+# separate pull_request run.
 on:
-  pull_request:
   push:
     branches-ignore: [main] # main is tested by pages.yml before it deploys
+    paths-ignore: ["**/*.md"]
   workflow_call:
 
 permissions:
   contents: read
+
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   test:
@@ -22,8 +28,13 @@ jobs:
       - run: npm ci
       - name: Syntax check
         run: node --check app.js
+      - name: Cache Playwright browser
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
       - name: Install Chromium
-        run: npx playwright install --with-deps chromium
+        run: npx playwright install --with-deps --only-shell chromium
       - name: Unit + e2e tests
         run: npm test
       - name: Upload Playwright report
