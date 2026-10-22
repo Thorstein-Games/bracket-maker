@@ -34,6 +34,18 @@ python3 -m http.server 8000
 # then visit http://localhost:8000/bracket-maker/
 ```
 
+## Tests
+
+The site has no dependencies; `package.json` is only for the test tooling ([Playwright](https://playwright.dev)).
+
+```sh
+npm ci
+npx playwright install chromium   # first time only
+npm test                          # unit + e2e (desktop and phone widths)
+```
+
+Unit tests call the bracket, seeding and share-link logic in `app.js` directly; e2e tests drive the real page (adding contenders, image search with a mocked Wikimedia API, drag & drop, running a bracket to the champion, persistence, share links). GitHub Actions runs them on every pull request and branch push, and `main` only deploys when they pass.
+
 ## Possible next steps
 
 - Export the bracket as a PNG

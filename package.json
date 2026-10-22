@@ -1,0 +1,13 @@
+{
+  "name": "bracket-maker-tests",
+  "private": true,
+  "description": "Test tooling only. The site itself has no dependencies and no build step.",
+  "scripts": {
+    "test": "playwright test",
+    "test:unit": "playwright test --project=unit",
+    "test:e2e": "playwright test --project=e2e-desktop --project=e2e-phone"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.56.1"
+  }
+}

@@ -1,6 +1,6 @@
 # Bracket Maker
 
-Client-side "build your own bracket" game (sister app of `tier-ranker`, which it shares its add/search/drag code with). Plain HTML/CSS/JS with **no build step, no dependencies, no package.json**. The code lives in three files:
+Client-side "build your own bracket" game (sister app of `tier-ranker`, which it shares its add/search/drag code with). Plain HTML/CSS/JS with **no build step and no runtime dependencies**. The root `package.json` holds only the test tooling (`@playwright/test`, a devDependency); the site never loads anything from it. The code lives in three files:
 
 - `index.html`: markup, including the `<dialog>`s: image search, edit contender, share, versus and champion.
 - `app.js`: all logic, organised into `/* ---- section ---- */` blocks: IndexedDB, state, bracket logic, rendering, pan & zoom, adding contenders, image search, editing, drag & drop, versus screen, champion, sharing.
@@ -32,7 +32,8 @@ Ads (rules and options in the thorstein-games-website CLAUDE.md): a `<tg-ad form
 ## Paths and deployment
 
 - Asset paths are **absolute** (`/bracket-maker/app.js`) because thorsteingames.com proxies `/bracket-maker` to this repo's GitHub Pages site (proxy rules in the `thorstein-games-website` repo's `public/_redirects`). Keep new asset references in that form.
-- `.github/workflows/pages.yml` deploys `main` and copies an **explicit file list** (`index.html style.css app.js favicon.svg apple-touch-icon.png og-image.jpg .nojekyll`). **If you add a file the site needs, add it to that `cp` line too.**
+- `.github/workflows/pages.yml` deploys `main` and copies an **explicit file list** (`index.html style.css app.js favicon.svg apple-touch-icon.png og-image.jpg .nojekyll`). **If you add a file the site needs, add it to that `cp` line too** (a test checks every `/bracket-maker/...` reference in `index.html` is in it). Test files never go in that list.
+- `pages.yml` first runs the reusable `.github/workflows/test.yml` and only deploys if it passes. `test.yml` also runs on pull requests and on pushes to other branches.
 
 ## Running and verifying
 
@@ -43,8 +44,28 @@ cd .. && python3 -m http.server 8000   # open http://localhost:8000/bracket-make
 ```
 
 - Syntax check: `node --check app.js`
-- There is no test suite. Verify UI changes in a browser. Playwright with Chromium works for headless checks. In sandboxes without outbound network, mock `*.wikipedia.org` / `commons.wikimedia.org` / `upload.wikimedia.org` with `page.route` (send `access-control-allow-origin: *`).
-- Check both desktop and phone widths (around 390px).
+- Run the tests (below) before pushing. For UI changes, also look at the page in a browser at desktop and phone widths (around 390px).
+
+## Testing
+
+Playwright (Chromium) runs everything; there is no other test runner. `npm ci` once, then:
+
+```sh
+npm test              # everything
+npm run test:unit     # app.js logic only
+npm run test:e2e      # user flows at desktop (1280px) and phone (390px, touch) widths
+npx playwright test tests/e2e/run.spec.js -g "champion"   # one file / test
+```
+
+If Chromium isn't installed yet: `npx playwright install chromium` (CI uses `--with-deps`). `@playwright/test` is pinned to an exact version; bump it deliberately.
+
+- `playwright.config.js` starts `tests/serve.js`, a tiny static server that serves the repo at `/bracket-maker/` like production (port 4391, override with `PORT`). Projects: `unit`, `e2e-desktop`, `e2e-phone`.
+- `tests/unit/`: `app.js` is a classic script, so its top-level functions and `state` are globals. Unit tests load the page and call them through `page.evaluate` (`computeBracket`, `spreadOrder`, `commit`, `loadState`, `encodeBracket`, `openSharedLink`…). Don't refactor `app.js` into modules just for tests.
+- `tests/e2e/`: real clicks, typing, uploads and pointer drags.
+- `tests/helpers.js` (import `test`/`expect` from it, not from `@playwright/test`): **no real network**. Every non-localhost request is mocked or blocked: `tg-bar.js` is stubbed, `upload.wikimedia.org` returns generated PNGs, `mockWikimedia(page)` fakes the search API. Any console error or uncaught exception fails the test; a test that expects one (e.g. a 404) must check and clear `errors`.
+- Share links: keep the hard-coded `V1_CODE` test in `tests/unit/share.spec.js` passing; old links must keep opening.
+- No fixed sleeps: wait on UI state with `expect(...)` / `expect.poll`.
+- When you add a feature, add tests for it; when a test fails, fix the app rather than loosening the test.
 
 ## Style
 

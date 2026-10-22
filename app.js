@@ -196,7 +196,8 @@ function hueFor(text) {
 
 function initials(name) {
   const words = name.trim().split(/\s+/).filter(Boolean);
-  return (words.length > 1 ? words[0][0] + words[1][0] : [...(words[0] || '?')].slice(0, 2).join('')).toUpperCase();
+  const first = (w) => [...w][0]; // whole code point, so emoji aren't split in half
+  return (words.length > 1 ? first(words[0]) + first(words[1]) : [...(words[0] || '?')].slice(0, 2).join('')).toUpperCase();
 }
 
 // Image, or a colored initials tile for name-only contenders.
@@ -834,9 +835,9 @@ function startDrag(e) {
   autoScroll();
 }
 
-function insertionIndex(x, y) {
+function insertionIndex(x, y, dragged) {
   for (const child of poolEl.children) {
-    if (child === drag.el) continue;
+    if (child === dragged) continue;
     const r = child.getBoundingClientRect();
     if (y < r.top || (y <= r.bottom && x < r.left + r.width / 2)) return state.pool.indexOf(child.dataset.id);
   }
@@ -895,7 +896,7 @@ function endDrag(e, cancelled) {
     }
     state.slots[to] = d.id;
   } else if (d.target === poolEl) {
-    let at = insertionIndex(e.clientX, e.clientY);
+    let at = insertionIndex(e.clientX, e.clientY, d.el);
     if (fromSeat >= 0) state.slots[fromSeat] = null;
     else {
       const i = state.pool.indexOf(d.id);
@@ -955,6 +956,8 @@ function openMatch(match) {
   // Restart the entrance animation.
   vsDialog.classList.remove('enter');
   if (!vsDialog.open) vsDialog.showModal();
+  // "Next match" had focus and is now hidden: refocus inside the dialog so ← / → still pick.
+  else if (!vsDialog.contains(document.activeElement)) $('#vs-close').focus();
   void vsDialog.offsetWidth;
   vsDialog.classList.add('enter');
 }
